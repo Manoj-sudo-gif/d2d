@@ -13,9 +13,10 @@ import {
   Image as ImageIcon,
   Check,
 } from 'lucide-react';
+import { D2DSheetModal, SheetTabId } from './D2DSheetModal';
 
 export interface SheetButtonItem {
-  id: string;
+  id: SheetTabId;
   name: string;
   subtitle: string;
   department: string;
@@ -27,6 +28,8 @@ export interface SheetButtonItem {
   icon: React.ElementType;
 }
 
+// Permanent default configurations - NO example sheets!
+// Uses embedded D2D GM Fashions Master Data across all systems by default
 export const COLORFUL_BUTTONS: SheetButtonItem[] = [
   {
     id: 'ean',
@@ -34,8 +37,8 @@ export const COLORFUL_BUTTONS: SheetButtonItem[] = [
     subtitle: 'Master Barcode & EAN Catalog',
     department: 'IT Department',
     role: 'it_admin',
-    defaultUrl: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=0',
-    description: 'Master EAN barcode catalog and SKU assignments.',
+    defaultUrl: '',
+    description: 'Master EAN barcode catalog and SKU assignments (GM Fashions).',
     borderHoverColor: 'hover:border-emerald-500 hover:shadow-emerald-500/25',
     iconBg: 'bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 text-white shadow-emerald-500/35',
     icon: Barcode,
@@ -46,8 +49,8 @@ export const COLORFUL_BUTTONS: SheetButtonItem[] = [
     subtitle: 'Master Inventory Dataset',
     department: 'IT Department',
     role: 'it_admin',
-    defaultUrl: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=1',
-    description: 'Master product inventory dataset with live stock and quantities.',
+    defaultUrl: '',
+    description: 'Master product inventory dataset with live stock across all GM Fashions stores.',
     borderHoverColor: 'hover:border-blue-500 hover:shadow-blue-500/25',
     iconBg: 'bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 text-white shadow-blue-500/35',
     icon: Boxes,
@@ -55,11 +58,11 @@ export const COLORFUL_BUTTONS: SheetButtonItem[] = [
   {
     id: 'image',
     name: 'Image Data',
-    subtitle: 'Asset Links & Google Drive Folders',
+    subtitle: 'Asset Links & High Res Photos',
     department: 'IT Department',
     role: 'it_admin',
-    defaultUrl: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=2',
-    description: 'Google Drive folder links, raw shoot files, and image status tracking.',
+    defaultUrl: '',
+    description: 'Photo links (Front, Back, Side, Texture) and IT upload status.',
     borderHoverColor: 'hover:border-violet-500 hover:shadow-violet-500/25',
     iconBg: 'bg-gradient-to-tr from-purple-600 via-violet-600 to-fuchsia-400 text-white shadow-purple-500/35',
     icon: ImageIcon,
@@ -70,8 +73,8 @@ export const COLORFUL_BUTTONS: SheetButtonItem[] = [
     subtitle: 'Photography Queue & Model Shoots',
     department: 'Photo Team',
     role: 'photo_team',
-    defaultUrl: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=3',
-    description: 'Studio photography assignment board and shot status.',
+    defaultUrl: '',
+    description: 'Studio photography assignment board, in/out dates, and status.',
     borderHoverColor: 'hover:border-amber-500 hover:shadow-amber-500/25',
     iconBg: 'bg-gradient-to-tr from-amber-500 via-orange-500 to-yellow-400 text-white shadow-amber-500/35',
     icon: Camera,
@@ -82,8 +85,8 @@ export const COLORFUL_BUTTONS: SheetButtonItem[] = [
     subtitle: 'Graphic Design & Marketing Banners',
     department: 'Creative Team',
     role: 'creative_team',
-    defaultUrl: 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit#gid=4',
-    description: 'Post-production banners, creative retouching, and marketing creatives.',
+    defaultUrl: '',
+    description: 'Style numbers, creative assignments, and department workflows.',
     borderHoverColor: 'hover:border-pink-500 hover:shadow-pink-500/25',
     iconBg: 'bg-gradient-to-tr from-pink-600 via-rose-500 to-fuchsia-400 text-white shadow-pink-500/35',
     icon: Palette,
@@ -103,13 +106,33 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
   const { currentUser, googleSheetUrls, setGoogleSheetUrl, addToast } = useWorkflow();
 
   const [urlsInput, setUrlsInput] = useState<Record<string, string>>({});
+  const [selectedSheetTab, setSelectedSheetTab] = useState<SheetTabId>('ean');
+  const [isSheetModalOpen, setIsSheetModalOpen] = useState(false);
+
+  // Automatically purge any stale example sheet URLs on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('d2d_google_sheet_urls');
+      if (stored && stored.includes('1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms')) {
+        localStorage.removeItem('d2d_google_sheet_urls');
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Sync URLs when settings modal opens
   useEffect(() => {
     if (isSettingsOpen) {
       const currentMap: Record<string, string> = {};
       COLORFUL_BUTTONS.forEach((btn) => {
-        currentMap[btn.id] = googleSheetUrls[btn.id] || btn.defaultUrl;
+        const custom = googleSheetUrls[btn.id] || '';
+        // If it was the old demo URL, clear it
+        if (custom.includes('1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms')) {
+          currentMap[btn.id] = '';
+        } else {
+          currentMap[btn.id] = custom;
+        }
       });
       setUrlsInput(currentMap);
     }
@@ -125,11 +148,22 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
     return btn.role === userRole;
   });
 
-  // Open Google Sheet in a brand new tab
+  // Open Google Sheet or embedded D2D Master Sheet
   const handleOpenSheet = (btn: SheetButtonItem) => {
-    const url = googleSheetUrls[btn.id] || btn.defaultUrl;
-    window.open(url, '_blank', 'noopener,noreferrer');
-    addToast('Opening Google Sheet', `Opening "${btn.name}" in a new tab...`, 'success');
+    const customUrl = googleSheetUrls[btn.id];
+    // If a valid custom Google Sheet URL is configured (not the example sheet), open it
+    if (
+      customUrl &&
+      customUrl.trim() &&
+      !customUrl.includes('1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms')
+    ) {
+      window.open(customUrl.trim(), '_blank', 'noopener,noreferrer');
+      addToast('Opening Google Sheet', `Opening "${btn.name}" in a new tab...`, 'success');
+    } else {
+      // Default: Open the embedded D2D Master Sheet modal with the exact GM Fashions dataset
+      setSelectedSheetTab(btn.id);
+      setIsSheetModalOpen(true);
+    }
   };
 
   // Save all custom URLs
@@ -137,7 +171,7 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
     e.preventDefault();
     COLORFUL_BUTTONS.forEach((btn) => {
       const entered = urlsInput[btn.id];
-      if (entered && entered.trim()) {
+      if (entered !== undefined) {
         setGoogleSheetUrl(btn.id, entered.trim());
       }
     });
@@ -147,26 +181,31 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
 
   // Reset a specific button to default in settings modal
   const handleResetSingleUrl = (btnId: string) => {
-    const target = COLORFUL_BUTTONS.find((b) => b.id === btnId);
-    if (target) {
-      setUrlsInput((prev) => ({ ...prev, [btnId]: target.defaultUrl }));
-    }
+    setUrlsInput((prev) => ({ ...prev, [btnId]: '' }));
+    setGoogleSheetUrl(btnId, '');
   };
 
-  // Reset all buttons to defaults
+  // Reset all buttons to defaults (clears to embedded D2D master sheet)
   const handleResetAllUrls = () => {
     const defaultMap: Record<string, string> = {};
     COLORFUL_BUTTONS.forEach((btn) => {
-      defaultMap[btn.id] = btn.defaultUrl;
-      setGoogleSheetUrl(btn.id, btn.defaultUrl);
+      defaultMap[btn.id] = '';
+      setGoogleSheetUrl(btn.id, '');
     });
     setUrlsInput(defaultMap);
-    addToast('Reset to Defaults', 'All buttons have been reset to their default Google Sheets.', 'info');
+    try {
+      localStorage.removeItem('d2d_google_sheet_urls');
+    } catch {}
+    addToast('Reset to Defaults', 'All buttons set to default D2D Master Sheets.', 'info');
   };
 
   // Minimalist Square Button Renderer
   const renderSquareButton = (btn: SheetButtonItem) => {
     const IconComponent = btn.icon;
+    const hasCustomUrl = Boolean(
+      googleSheetUrls[btn.id] &&
+        !googleSheetUrls[btn.id].includes('1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms')
+    );
 
     return (
       <button
@@ -187,12 +226,61 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
         <h3 className="text-base sm:text-lg font-black text-slate-800 group-hover:text-slate-950 transition-colors tracking-tight leading-snug">
           {btn.name}
         </h3>
+
+        {/* Small badge showing source */}
+        <span className="mt-2 text-[10px] font-mono font-medium text-slate-500 bg-slate-100 group-hover:bg-emerald-50 group-hover:text-emerald-800 px-2 py-0.5 rounded-full transition">
+          {hasCustomUrl ? 'Google Sheet Link' : 'D2D Master Data'}
+        </span>
       </button>
     );
   };
 
   return (
-    <div id="clean-button-portal" className="max-w-5xl mx-auto py-6 sm:py-10 space-y-8 animate-in fade-in duration-200">
+    <div id="clean-button-portal" className="max-w-5xl mx-auto py-4 sm:py-6 space-y-6 animate-in fade-in duration-200">
+      {/* -------------------------------------------------------------
+          D2D GM FASHIONS MASTER SPREADSHEET BANNER
+         ------------------------------------------------------------- */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white rounded-3xl border border-emerald-500/20 shadow-lg">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0">
+            <FileSpreadsheet className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold text-white tracking-tight">D2D GM Fashions Master Sheets</h2>
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded-full border border-emerald-500/30">
+                Permanent Data
+              </span>
+            </div>
+            <p className="text-xs text-slate-300">
+              Direct access to EAN Codes, Product Inventory, Image Links, Photo Team, and Creative Dept.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => {
+              setSelectedSheetTab('ean');
+              setIsSheetModalOpen(true);
+            }}
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[#0f9d58] hover:bg-[#0b8043] text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-900/30 transition cursor-pointer"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Open Master Sheets</span>
+          </button>
+          {userRole === 'it_admin' && (
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold text-xs border border-white/10 transition cursor-pointer"
+              title="Configure custom Google Sheets links"
+            >
+              <Settings className="w-4 h-4 text-emerald-400" />
+              <span className="hidden sm:inline">Settings</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* -------------------------------------------------------------
           MINIMALIST SQUARE BUTTONS GRID
           - For IT Department: 3 on Top Row, 2 on Bottom Row
@@ -224,6 +312,16 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
       )}
 
       {/* -------------------------------------------------------------
+          PERMANENT D2D MASTER SPREADSHEET VIEWER MODAL
+         ------------------------------------------------------------- */}
+      <D2DSheetModal
+        isOpen={isSheetModalOpen}
+        onClose={() => setIsSheetModalOpen(false)}
+        initialTab={selectedSheetTab}
+        customExternalUrl={googleSheetUrls[selectedSheetTab]}
+      />
+
+      {/* -------------------------------------------------------------
           SETTINGS MODAL: CONFIGURE ALL GOOGLE SHEET LINKS
          ------------------------------------------------------------- */}
       {isSettingsOpen && (
@@ -237,10 +335,10 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                    Google Sheet Settings
+                    IT Department - Google Sheet Settings
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Paste your company's actual Google Sheet URL for each button.
+                    Paste your company's actual Google Sheet URL for each button or leave blank to use the default D2D Master Sheet.
                   </p>
                 </div>
               </div>
@@ -279,22 +377,31 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => window.open(currentVal || btn.defaultUrl, '_blank', 'noopener,noreferrer')}
+                            onClick={() => {
+                              if (currentVal && currentVal.trim()) {
+                                window.open(currentVal.trim(), '_blank', 'noopener,noreferrer');
+                              } else {
+                                setSelectedSheetTab(btn.id);
+                                setIsSheetModalOpen(true);
+                              }
+                            }}
                             className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1 cursor-pointer hover:underline"
-                            title="Test open this link in a new tab"
+                            title="Preview sheet"
                           >
-                            <span>Test</span>
+                            <span>Preview</span>
                             <ExternalLink className="w-3 h-3" />
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => handleResetSingleUrl(btn.id)}
-                            className="text-[11px] text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 cursor-pointer hover:underline"
-                            title="Reset this link to default"
-                          >
-                            <RotateCcw className="w-3 h-3" />
-                            <span>Reset</span>
-                          </button>
+                          {currentVal && (
+                            <button
+                              type="button"
+                              onClick={() => handleResetSingleUrl(btn.id)}
+                              className="text-[11px] text-slate-500 hover:text-slate-800 font-medium flex items-center gap-1 cursor-pointer hover:underline"
+                              title="Reset this link to embedded D2D default"
+                            >
+                              <RotateCcw className="w-3 h-3" />
+                              <span>Reset</span>
+                            </button>
+                          )}
                         </div>
                       </div>
 
@@ -304,9 +411,8 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
                         onChange={(e) =>
                           setUrlsInput((prev) => ({ ...prev, [btn.id]: e.target.value }))
                         }
-                        placeholder={btn.defaultUrl}
+                        placeholder="Default: Embedded D2D Master Sheet (Permanent across all devices)"
                         className="w-full px-3 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-800 bg-white shadow-2xs"
-                        required
                       />
                     </div>
                   );
@@ -320,7 +426,7 @@ export const CleanButtonPortal: React.FC<CleanButtonPortalProps> = ({
                   onClick={handleResetAllUrls}
                   className="text-xs text-slate-500 hover:text-rose-600 font-medium underline cursor-pointer"
                 >
-                  Reset All to Defaults
+                  Reset All to D2D Defaults
                 </button>
 
                 <div className="flex items-center gap-2.5">

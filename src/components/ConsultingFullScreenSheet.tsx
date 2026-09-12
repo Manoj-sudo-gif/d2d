@@ -25,8 +25,7 @@ export const ConsultingFullScreenSheet: React.FC<ConsultingFullScreenSheetProps>
 }) => {
   const { googleSheetUrls, setGoogleSheetUrl, addToast } = useWorkflow();
 
-  const defaultConsultingUrl =
-    'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/preview';
+  const defaultConsultingUrl = '';
 
   const currentRawUrl = googleSheetUrls.consulting || defaultConsultingUrl;
   const [isUrlModalOpen, setIsUrlModalOpen] = useState(false);
