@@ -231,7 +231,7 @@ export const GoogleSheetFrame: React.FC<GoogleSheetFrameProps> = ({
     } else if (sheetType === 'consulting') {
       const headers = ['Category', 'Details', 'Source'];
       const rows = [
-        ['Google Sheet URL', googleSheetUrls.consulting || 'Google Sheets Master', 'docs.google.com'],
+        ['Google Sheet URL', googleSheetUrls.consulting || 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit', 'docs.google.com'],
         ['Mode', 'Full Screen Interactive Google Sheet', 'Live Synchronized'],
       ];
       downloadCSV(`D2D_Consulting_Sheet_${timestamp}`, headers, rows);
@@ -693,6 +693,20 @@ export const GoogleSheetFrame: React.FC<GoogleSheetFrameProps> = ({
                   Embed Now
                 </button>
               </div>
+
+              {/* Demo sheet quick test button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const demoUrl = 'https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/preview';
+                  setTempUrl(demoUrl);
+                  setGoogleSheetUrl(sheetType, demoUrl);
+                  addToast('Sample Live Sheet Loaded', 'Now showing live Google Sheet iframe inside your site.', 'info');
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 font-medium underline cursor-pointer"
+              >
+                Or click here to test with a Public Sample Google Sheet
+              </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-slate-100 text-left bg-slate-50 p-4 rounded-xl text-xs text-slate-600 space-y-2">
