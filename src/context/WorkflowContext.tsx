@@ -125,11 +125,13 @@ export const defaultUsers: Record<UserRole, UserSession> = {
 const WorkflowContext = createContext<WorkflowContextType | null>(null);
 
 export const WorkflowProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Active user session: ALWAYS start as null so login is displayed first on load and on every page refresh
+  // Active user session: load from localStorage if previously authenticated
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => {
     try {
-      localStorage.removeItem(USER_KEY);
-      sessionStorage.removeItem(USER_KEY);
+      const saved = localStorage.getItem(USER_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
     } catch {
       // ignore
     }
@@ -302,6 +304,11 @@ export const WorkflowProvider: React.FC<{ children: ReactNode }> = ({ children }
   const loginAsRole = useCallback((role: UserRole) => {
     const user = defaultUsers[role];
     setCurrentUser(user);
+    try {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    } catch {
+      // ignore
+    }
     if (role === 'it_admin') {
       setItActivePanel('all');
     }
@@ -355,6 +362,11 @@ export const WorkflowProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const logout = useCallback(() => {
     setCurrentUser(null);
+    try {
+      localStorage.removeItem(USER_KEY);
+    } catch {
+      // ignore
+    }
     addToast('Signed Out', 'You have been logged out.', 'info');
   }, [addToast]);
 

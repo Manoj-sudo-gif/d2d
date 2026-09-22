@@ -16,10 +16,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   canDismiss = false,
   inline = false,
 }) => {
-  const { loginWithCredentials, currentUser } = useWorkflow();
+  const { loginWithCredentials, loginAsRole, currentUser } = useWorkflow();
   const [activeTab, setActiveTab] = useState<UserRole>('it_admin');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('it');
+  const [password, setPassword] = useState('it@123');
   const [showPass, setShowPass] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -28,6 +28,16 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const handleTabChange = (role: UserRole) => {
     setActiveTab(role);
     setErrorMsg(null);
+    if (role === 'it_admin') {
+      setUsername('it');
+      setPassword('it@123');
+    } else if (role === 'photo_team') {
+      setUsername('pt');
+      setPassword('pt@123');
+    } else {
+      setUsername('gd');
+      setPassword('gd@123');
+    }
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -199,6 +209,18 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               Open {activeTab === 'it_admin' ? 'IT Department' : activeTab === 'photo_team' ? 'Photo Team' : 'Godown Team'} Workspace
             </span>
             <ArrowRight className="w-4 h-4" />
+          </button>
+
+          <button
+            id="direct-open-btn"
+            type="button"
+            onClick={() => {
+              loginAsRole(activeTab);
+              if (onClose) onClose();
+            }}
+            className="w-full py-2.5 px-4 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200/80 rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <span>Direct 1-Click Access (Bypass Code)</span>
           </button>
         </form>
 
