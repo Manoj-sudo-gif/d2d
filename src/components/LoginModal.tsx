@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useWorkflow } from '../context/WorkflowContext';
 import { UserRole } from '../types';
-import { ShieldCheck, Camera, Palette, User, ArrowRight, Lock, Check } from 'lucide-react';
+import { ShieldCheck, Camera, Boxes, User, ArrowRight, Lock, Check, Eye, EyeOff } from 'lucide-react';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -20,6 +20,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
   const [activeTab, setActiveTab] = useState<UserRole>('it_admin');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPass, setShowPass] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -36,7 +37,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
       setErrorMsg(null);
       if (onClose) onClose();
     } else {
-      setErrorMsg('Invalid department credentials. Please enter your username and password.');
+      setErrorMsg('Invalid department credentials. Please enter the correct department code and access key.');
     }
   };
 
@@ -53,8 +54,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               <ShieldCheck className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">Department Portal</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Sign in to access your Department Google Sheets</p>
+              <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">D2D Internal Portal</h3>
+              <p className="text-xs text-slate-500 mt-0.5">Day 2 Day Workflow Management & Google Sheets Hub</p>
             </div>
           </div>
           {canDismiss && onClose && (
@@ -111,8 +112,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
                 : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
             }`}
           >
-            <Palette className="w-3.5 h-3.5 shrink-0" />
-            <span>Creative Dept</span>
+            <Boxes className="w-3.5 h-3.5 shrink-0" />
+            <span>Godown Team</span>
             {currentUser?.role === 'creative_team' && <Check className="w-3 h-3 ml-0.5 text-emerald-300" />}
           </button>
         </div>
@@ -120,10 +121,10 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
       {/* Form Body */}
       <div className="p-6 sm:p-7">
-        <form onSubmit={handleFormSubmit} className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4" autoComplete="off">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">
-              Username
+            <label className="block text-xs font-bold text-slate-700 mb-1.5" htmlFor="login-username-input">
+              Department Code
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -131,29 +132,47 @@ export const LoginModal: React.FC<LoginModalProps> = ({
               </div>
               <input
                 id="login-username-input"
+                name="team_id"
                 type="text"
+                autoComplete="off"
+                spellCheck={false}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition"
-                placeholder="Username"
+                placeholder="Enter department code (e.g. it, pt, gd)"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1.5">Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-bold text-slate-700" htmlFor="login-password-input">
+                Access Passcode
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                className="text-[11px] font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer select-none"
+              >
+                {showPass ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <span>{showPass ? 'Hide' : 'Show'}</span>
+              </button>
+            </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <Lock className="w-4 h-4" />
               </div>
               <input
                 id="login-password-input"
-                type="password"
+                name="access_passcode"
+                type="text"
+                style={showPass ? undefined : ({ WebkitTextSecurity: 'disc' } as React.CSSProperties)}
+                autoComplete="off"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition"
-                placeholder="Enter password"
+                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 transition font-mono"
+                placeholder="Enter team passcode"
                 required
               />
             </div>
@@ -177,7 +196,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             }`}
           >
             <span>
-              Sign In to {activeTab === 'it_admin' ? 'IT Department' : activeTab === 'photo_team' ? 'Photo Team' : 'Creative Department'}
+              Open {activeTab === 'it_admin' ? 'IT Department' : activeTab === 'photo_team' ? 'Photo Team' : 'Godown Team'} Workspace
             </span>
             <ArrowRight className="w-4 h-4" />
           </button>
@@ -185,8 +204,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
         {/* Professional Footer */}
         <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-          <span>Department Access Control</span>
-          <span>Encrypted Portal Session</span>
+          <span>D2D Internal Workflow Workspace</span>
+          <span>Authorized Team Portal</span>
         </div>
       </div>
     </div>

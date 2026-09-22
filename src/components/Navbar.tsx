@@ -3,7 +3,7 @@ import { useWorkflow } from '../context/WorkflowContext';
 import {
   ShieldCheck,
   Camera,
-  Palette,
+  Boxes,
   LogOut,
   Settings,
 } from 'lucide-react';
@@ -28,8 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenLoginModal, onOpenSettings
           icon: Camera,
         }
       : {
-          label: 'Creative Department',
-          icon: Palette,
+          label: 'Godown Team',
+          icon: Boxes,
         };
 
   const IconComp = currentRoleBadge?.icon;

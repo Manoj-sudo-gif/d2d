@@ -38,7 +38,7 @@ export const BoxButtonsHub: React.FC<BoxButtonsHubProps> = ({ onSelectSheet, onO
                   ? 'IT Master Admin'
                   : userRole === 'photo_team'
                   ? 'Photo Studio Portal'
-                  : 'Creative Department Portal'}
+                  : 'Godown Team Portal'}
               </span>
               <span className="text-xs text-slate-500">• Public Live Access</span>
             </div>
@@ -320,7 +320,7 @@ export const BoxButtonsHub: React.FC<BoxButtonsHubProps> = ({ onSelectSheet, onO
                 Google Sheet 5
               </div>
               <h3 className="text-base font-bold text-slate-900 group-hover:text-amber-600 transition">
-                CREATIVE DEPARTMENT DASHBOARD
+                GODOWN TEAM
               </h3>
               <p className="text-xs text-slate-500 mt-2 leading-relaxed">
                 EAN CODE, STYLE NO, Product Name, Status / Remarks, and Date.

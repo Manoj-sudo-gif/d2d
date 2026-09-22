@@ -115,10 +115,10 @@ export const defaultUsers: Record<UserRole, UserSession> = {
   },
   creative_team: {
     id: 'user-creative-01',
-    username: 'crd',
-    name: 'Creative Department',
+    username: 'gd',
+    name: 'Godown Team',
     role: 'creative_team',
-    email: 'crd@d2d-systems.io',
+    email: 'godown@d2d-systems.io',
   },
 };
 
@@ -311,7 +311,7 @@ export const WorkflowProvider: React.FC<{ children: ReactNode }> = ({ children }
   // USER & PASSWORD CHECK:
   // IT: user: "it", pass: "it@123"
   // Photo: user: "pt", pass: "pt@123"
-  // Creative: user: "crd", pass: "crd@123"
+  // Godown: user: "gd" or "crd", pass: "gd@123" or "crd@123"
   const loginWithCredentials = useCallback(
     (username: string, pass: string): boolean => {
       const u = username.trim().toLowerCase();
@@ -325,7 +325,11 @@ export const WorkflowProvider: React.FC<{ children: ReactNode }> = ({ children }
         loginAsRole('photo_team');
         return true;
       }
-      if (u === 'crd' && p === 'crd@123') {
+      if ((u === 'gd' || u === 'godown') && (p === 'gd@123' || p === 'godown@123' || p === 'crd@123')) {
+        loginAsRole('creative_team');
+        return true;
+      }
+      if (u === 'crd' && (p === 'crd@123' || p === 'gd@123')) {
         loginAsRole('creative_team');
         return true;
       }
@@ -339,7 +343,7 @@ export const WorkflowProvider: React.FC<{ children: ReactNode }> = ({ children }
         loginAsRole('photo_team');
         return true;
       }
-      if (u === 'creative_team' && (p === 'creative123' || p === 'crd@123')) {
+      if ((u === 'creative_team' || u === 'godown_team') && (p === 'creative123' || p === 'crd@123' || p === 'gd@123')) {
         loginAsRole('creative_team');
         return true;
       }

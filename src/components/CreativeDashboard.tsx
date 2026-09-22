@@ -2,7 +2,7 @@ import React from 'react';
 import { useWorkflow } from '../context/WorkflowContext';
 import { DataTable, ColumnDef } from './DataTable';
 import { CreativeDepartmentItem, CreativeStatus } from '../types';
-import { Palette, UserCheck } from 'lucide-react';
+import { Boxes, UserCheck } from 'lucide-react';
 
 interface CreativeDashboardProps {
   onOpenSheetsModal: () => void;
@@ -103,20 +103,20 @@ export const CreativeDashboard: React.FC<CreativeDashboardProps> = ({ onOpenShee
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-800 border border-amber-300 flex items-center justify-center shadow-xs">
-              <Palette className="w-6 h-6" />
+              <Boxes className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300 uppercase tracking-wide">
-                  Creative Department Portal
+                  GODOWN TEAM PORTAL
                 </span>
-                <span className="text-xs text-slate-500">Design, Social Banners & Marketplace Listings</span>
+                <span className="text-xs text-slate-500">Inventory, Stock Dispatch & Warehouse Listings</span>
               </div>
               <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-1">
-                Assigned Creative Tasks Sheet
+                Assigned Godown Tasks Sheet
               </h2>
               <p className="text-xs text-slate-600">
-                Mirrored directly with IT Department Panel 3. Update EAN design progress and release dates below.
+                Mirrored directly with IT Department Panel 3. Update EAN progress and release dates below.
               </p>
             </div>
           </div>
@@ -124,7 +124,7 @@ export const CreativeDashboard: React.FC<CreativeDashboardProps> = ({ onOpenShee
           {/* Quick Metrics */}
           <div className="flex items-center gap-2 text-xs">
             <div className="px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-xs">
-              <span className="text-slate-500 block text-[10px]">In Design</span>
+              <span className="text-slate-500 block text-[10px]">In Progress</span>
               <span className="text-base font-bold text-amber-700">{inDesignCount}</span>
             </div>
             <div className="px-3 py-2 bg-white border border-slate-200 rounded-xl shadow-xs">
@@ -146,15 +146,15 @@ export const CreativeDashboard: React.FC<CreativeDashboardProps> = ({ onOpenShee
         </div>
       </div>
 
-      {/* Main Creative Sheet Table */}
+      {/* Main Godown Sheet Table */}
       <DataTable
         id="creative-department-restricted-sheet"
-        title="Creative Department Sheet"
-        subtitle="Columns: EAN Code | Product Name | Date | Upload/Design Status"
+        title="Godown Team Sheet"
+        subtitle="Columns: EAN Code | Product Name | Date | Status"
         data={creativeList}
         columns={creativeColumns}
         keyField="id"
-        emptyMessage="No creative tasks assigned yet. Items are assigned by the IT Department from Master Data."
+        emptyMessage="No godown tasks assigned yet. Items are assigned by the IT Department from Master Data."
         onExportToGoogleSheets={onOpenSheetsModal}
       />
     </div>

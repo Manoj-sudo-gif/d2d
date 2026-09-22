@@ -48,9 +48,9 @@ function DashboardContent() {
       {/* Clean Minimal Footer: Made by Manoj with red heart */}
       <footer className="border-t border-slate-200/80 bg-white/70 backdrop-blur-xs py-4 px-6 text-xs text-slate-500">
         <div className="max-w-6xl mx-auto flex items-center justify-center gap-1.5">
-          <span className="text-slate-600 font-medium">Made by Manoj</span>
+          <span className="text-slate-600 font-medium">Made by Two Fellows</span>
           <span className="text-red-500 text-xs inline-block transform hover:scale-125 transition-transform select-none" title="Love">
-            ❤️
+            😎
           </span>
         </div>
       </footer>

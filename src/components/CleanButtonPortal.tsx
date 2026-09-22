@@ -78,15 +78,15 @@ export const COLORFUL_BUTTONS: SheetButtonItem[] = [
   },
   {
     id: 'creative',
-    name: 'Creative Department',
-    subtitle: 'Graphic Design & Marketing Banners',
-    department: 'Creative Team',
+    name: 'Godown Team',
+    subtitle: 'Godown Inventory & Stock Dispatch',
+    department: 'Godown Team',
     role: 'creative_team',
     defaultUrl: 'https://docs.google.com/spreadsheets/d/11I7JWFuDZ98ew68K0EGrvczfKlHlKRf0EB38giYWrhg/edit?gid=0#gid=0',
-    description: 'Post-production banners, creative retouching, and marketing creatives.',
+    description: 'Godown stock dispatch, inventory tracking, and warehouse cataloging.',
     borderHoverColor: 'hover:border-pink-500 hover:shadow-pink-500/25',
     iconBg: 'bg-gradient-to-tr from-pink-600 via-rose-500 to-fuchsia-400 text-white shadow-pink-500/35',
-    icon: Palette,
+    icon: Boxes,
   },
 ];
 
